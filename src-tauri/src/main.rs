@@ -3,8 +3,6 @@
   windows_subsystem = "windows"
 )]
 
-use pleco::{Board,Player,PieceType};
-
 fn main() {
   tauri::Builder::default()
     .run(tauri::generate_context!())

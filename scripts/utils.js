@@ -1,6 +1,7 @@
-import { WHITE_PAWN, BLACK_PAWN, WHITE_ROOK, BLACK_ROOK,
-    WHITE_BISHOP, BLACK_BISHOP, WHITE_KNIGHT, BLACK_KNIGHT,
-    WHITE_QUEEN, BLACK_QUEEN, BLACK_KING, WHITE_KING } from "../src/chess.js";
+import { ROW_LABELS, COL_LABELS, WHITE_PAWN, BLACK_PAWN, WHITE_ROOK,   BLACK_ROOK, WHITE_BISHOP, BLACK_BISHOP, WHITE_KNIGHT, BLACK_KNIGHT,
+    WHITE_QUEEN, BLACK_QUEEN, BLACK_KING, WHITE_KING } from '../src/chess.js';
+// import { TauriHttpClient } from '../classes/TauriHttpClient.js';
+import { FEN } from '../src/stores.js';
 
 export function getImg(val) {
     let retStr = 'assets/';
@@ -40,6 +41,9 @@ export function getImg(val) {
             break;
         case 'k':
             retStr += BLACK_KING;
+            break;
+        default:
+            retStr = '';
             break;
     }
     return retStr;
@@ -110,12 +114,13 @@ function translate(str) {
 }
 
 export function checkBoard(board, fen) {
+    // migstodo: validate fen?
     // split into string array representing rows
     var FENarr = fen.split(' '); // FENarr.length === 6
     var pos = FENarr[0].split('/'); // pos.length === 8
     var i = 0;
     for (let posStr of pos) {
-        console.log(board[i]);
+        // console.log(board[i]);
         let boardRowStr = concat1DStringArray(board[i]);
         // console.log(boardRowStr);
         posStr = munch(posStr);
@@ -126,4 +131,65 @@ export function checkBoard(board, fen) {
         i++;
     }
     return board;
+}
+
+export function getRandomBoard(serv) {
+    const url = serv + '/game/rand';
+    callEndpoint(url)
+        .then(fen => FEN.set(fen))
+        .catch(err => console.log(err));
+} 
+
+export function connectToServer(serv) {
+    const url = serv + '/game/pos';
+    callEndpoint(url)
+        .then(fen => FEN.set(fen))
+        .catch(err => console.log(err));
+}
+
+export function sendUCI(uci, serv) {
+    const url = serv + '/game/move';
+    var uci_wrapper = {"uci": uci};
+    callEndpoint(url, 'POST', uci_wrapper)
+        .then(fen => FEN.set(fen.slice(1, fen.length-1))) // removes double quotes
+        .catch(err => console.log(err));
+}
+
+export function sendFEN(fen, serv) {
+    const url = serv + '/game/set';
+    var fen_wrapper = {"fen": fen};
+    callEndpoint(url, 'PUT', fen_wrapper)
+        .then(fen => FEN.set(fen))
+        .catch(err => console.log(err));
+}
+
+export function generateMoves(src, serv) {
+    console.log("SOURCE SQ: " + src);
+}
+
+export function updateLoc(loc, r, c) {
+    let newLoc = ''
+    let locArr = [...loc]
+}
+
+function callEndpoint(url, method = 'GET', data = '') {
+    const http = window.__TAURI__.http;
+    if (method === 'GET') {
+        return http
+            .fetch(url, {
+                method: 'GET',
+                responseType: http.ResponseType.Text
+            }).then(resp => {
+                return resp.data
+            });
+    } else {
+        return http
+            .fetch(url, {
+                method: method,
+                body: http.Body.json(data),
+                responseType: http.ResponseType.Text
+            }).then(resp => { 
+                return resp.data
+            });
+    }
 }

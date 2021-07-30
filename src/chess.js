@@ -33,4 +33,7 @@ export const INITIAL_BOARD = [
     ['P','P','P','P','P','P','P','P'],
     ['R','N','B','Q','K','B','N','R']];
 
-export const INITIAL_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+export const INITIAL_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
+export const ROW_LABELS = ['8', '7', '6', '5', '4', '3', '2', '1'];
+export const COL_LABELS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];

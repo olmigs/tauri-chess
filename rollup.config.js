@@ -6,7 +6,6 @@ import { terser } from 'rollup-plugin-terser';
 import json from '@rollup/plugin-json';
 import css from 'rollup-plugin-css-only';
 import replace from '@rollup/plugin-replace';
-import { svelteSVG } from "rollup-plugin-svelte-svg";
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -67,7 +66,6 @@ export default {
 		json({
 			compact: true
 		}),
-		svelteSVG(),
 
 		// In dev mode, call `npm run start` once
 		// the bundle has been generated

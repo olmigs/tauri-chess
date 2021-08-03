@@ -1,9 +1,9 @@
 <script>
     import Grid from './Grid.svelte';
     // import Importer from './Importer.svelte'
-    import { FEN, SOURCE_ID, DESTINATION_ID } from './stores.js';
+    import { FEN, SOURCE_ID, DESTINATION_ID} from './stores.js';
     import { INITIAL_FEN } from './chess.js';
-    import { connectToServer, sendUCI, getRandomBoard, updateLoc, sendFEN } from '../scripts/utils.js';
+    import { callServer, connectToServer, sendUCI, getRandomBoard, updateLoc, sendFEN } from '../scripts/utils.js';
     export let server;
 
     function newGame() {
@@ -74,6 +74,7 @@
 <!-- <svelte:window on:keydown={handleKeydown}/> -->
 
 <main>
+    <!-- <p>{$CAPTURES}</p> -->
     <Grid />
     <div class="ctrl">
         <input id="fenbox" type="text" readonly="readonly" bind:value={$FEN}/>
@@ -115,9 +116,9 @@
         border-radius: 7px;
         padding: 10px;
     }
-    button.unimplemented {
+    /* button.unimplemented {
         background-color: #6d1e1e;
-    }
+    } */
     button.implemented {
         background-color: #3aaf28;
     }

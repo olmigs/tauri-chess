@@ -49,52 +49,6 @@ export function getImg(val) {
     return retStr;
 }
 
-// const board = [
-//     ['r','n','b','q','k','b','n','r'],
-//     ['p','p','p','p','p','p','p','p'],
-//     ['.','.','.','.','.','.','.','.'],
-//     ['.','.','.','.','.','.','.','.'],
-//     ['.','.','.','.','.','.','.','.'],
-//     ['.','.','.','.','.','.','.','.'],
-//     ['P','P','P','P','P','P','P','P'],
-//     ['R','N','B','Q','K','B','N','R']];
-
-// const fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-
-function concat1DStringArray(arr) {
-    let retStr = '';
-    for (let str of arr) {
-        retStr += str;
-    }
-    return retStr;
-}
-
-function isNumeric(num){
-    return !isNaN(num)
-}
-
-function chewStr(val) {
-    if (isNumeric(val)) {
-        let retStr = '';
-        for (let i = 0; i < val; i++) {
-            retStr += '.';
-        }
-        return retStr;
-    } else {
-        return val;
-    }
-}
-
-// migsnote: BADLY IMPLEMENTED i.e. not recursive
-function munch(str) {
-    var retStr = '';
-    var strArr = [...str];
-    for (let i = 0; i < strArr.length; i++) {
-        retStr += chewStr(strArr[i]);
-    }
-    return retStr;
-}
-
 // old attempt at recursion
 function translate(str) {
     if (str.length == 8) {
@@ -113,36 +67,20 @@ function translate(str) {
     }
 }
 
-export function checkBoard(board, fen) {
-    // migstodo: validate fen?
-    // split into string array representing rows
-    var FENarr = fen.split(' '); // FENarr.length === 6
-    var pos = FENarr[0].split('/'); // pos.length === 8
-    var i = 0;
-    for (let posStr of pos) {
-        // console.log(board[i]);
-        let boardRowStr = concat1DStringArray(board[i]);
-        // console.log(boardRowStr);
-        posStr = munch(posStr);
-        if (posStr !== boardRowStr) {
-            board[i] = [...posStr];
-            // return false;
-        }
-        i++;
-    }
-    return board;
+export function callServer(endpoint, server) {
+
 }
 
 export function getRandomBoard(serv) {
     const url = serv + '/game/rand';
-    callEndpoint(url)
+    callEndpoint(url, 'text')
         .then(fen => FEN.set(fen))
         .catch(err => console.log(err));
 } 
 
 export function connectToServer(serv) {
     const url = serv + '/game/pos';
-    callEndpoint(url)
+    callEndpoint(url, 'text')
         .then(fen => FEN.set(fen))
         .catch(err => console.log(err));
 }
@@ -150,15 +88,15 @@ export function connectToServer(serv) {
 export function sendUCI(uci, serv) {
     const url = serv + '/game/move';
     var uci_wrapper = {"uci": uci};
-    callEndpoint(url, 'POST', uci_wrapper)
+    callEndpoint(url, 'text', 'POST', uci_wrapper)
         .then(fen => FEN.set(fen.slice(1, fen.length-1))) // removes double quotes
         .catch(err => console.log(err));
 }
 
 export function sendFEN(fen, serv) {
     const url = serv + '/game/set';
-    var fen_wrapper = {"fen": fen};
-    callEndpoint(url, 'PUT', fen_wrapper)
+    var fen_wrapper = { "fen": fen };
+    callEndpoint(url, 'text', 'PUT', fen_wrapper)
         .then(fen => FEN.set(fen))
         .catch(err => console.log(err));
 }
@@ -167,18 +105,47 @@ export function generateMoves(src, serv) {
     console.log("SOURCE SQ: " + src);
 }
 
+export function getCaptures(serv) {
+    const url = serv + '/game/captures';
+    callEndpoint(url, 'text')
+        .then(captures => { 
+            // console.log(captures);
+            CAPTURES.set(captures); 
+        })
+        .catch(err => console.log(err));
+}
+
+export function getCapturesForSrc(src, captures) {
+    var arr = new Array();
+    for (let mov of captures) {
+        if (mov.slice(0, 2) == src) {
+            arr.push(mov);
+        }
+    }
+    return arr;
+}
+
 export function updateLoc(loc, r, c) {
     let newLoc = ''
     let locArr = [...loc]
 }
 
-function callEndpoint(url, method = 'GET', data = '') {
+export function callEndpoint(url, responseType, method = 'GET', data = '') {
     const http = window.__TAURI__.http;
+    var type;
+    switch (responseType) {
+        case 'json':
+            type = http.ResponseType.JSON;
+            break;
+        case 'text':
+            type = http.ResponseType.Text;
+            break;
+    }
     if (method === 'GET') {
         return http
             .fetch(url, {
                 method: 'GET',
-                responseType: http.ResponseType.Text
+                responseType: type
             }).then(resp => {
                 return resp.data
             });
@@ -187,7 +154,7 @@ function callEndpoint(url, method = 'GET', data = '') {
             .fetch(url, {
                 method: method,
                 body: http.Body.json(data),
-                responseType: http.ResponseType.Text
+                responseType: type
             }).then(resp => { 
                 return resp.data
             });

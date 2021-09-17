@@ -3,7 +3,7 @@
     // import Importer from './Importer.svelte'
     import { FEN, SOURCE_ID, DESTINATION_ID} from './stores.js';
     import { INITIAL_FEN } from './chess.js';
-    import { callServer, connectToServer, sendUCI, getRandomBoard, updateLoc, sendFEN } from '../scripts/utils.js';
+    import { callServer, connectToServer, sendUCI, getRandomBoard, updateLoc, sendFEN, generateMoves } from '../scripts/utils.js';
     export let server;
 
     function newGame() {
@@ -75,16 +75,22 @@
 
 <main>
     <!-- <p>{$CAPTURES}</p> -->
-    <Grid />
-    <div class="ctrl">
+    <div>
+        <Grid />
         <input id="fenbox" type="text" readonly="readonly" bind:value={$FEN}/>
+        <button class="implemented" on:click={() => sendFEN($FEN, server)}>Send to Server</button>
+    </div>
+    
+    <div class="ctrl">
+        <h1>chess man</h1>
+        <button class="implemented" on:click={() => connectToServer(server)}>Server FEN</button>
         <button class="implemented" on:click={newGame}>New Game</button>
-        <br />
-        <button class="implemented" on:click={() => connectToServer(server)}>Current Server FEN</button>
-        <button class="implemented" on:click={() => getRandomBoard(server)}>Get Random</button>
-        <button class="implemented" on:click={() => sendFEN($FEN, server)}>Send FEN to Server</button>
-        <button class="implemented" on:click={() => sendUCI($SOURCE_ID + $DESTINATION_ID, server)}>Complete & Send Move: {$SOURCE_ID} -</button>
-        <input id="ucibox" type="text" bind:value={$DESTINATION_ID} autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+        <button class="implemented" on:click={() => getRandomBoard(server)}>Random</button>
+        <div class="unflex">
+            <button class="implemented" on:click={() => sendUCI($SOURCE_ID + $DESTINATION_ID, server)}>Send Move: {$SOURCE_ID}</button>
+            <input id="ucibox" type="text" bind:value={$DESTINATION_ID} autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+        </div>
+        <button class="unimplemented" on:click={() => generateMoves($SOURCE_ID, server)}>Get Moves for {$SOURCE_ID}</button>
     </div>
 </main>
 
@@ -96,19 +102,36 @@
         text-align: center;
         padding-top: 20px;
         overflow-x: hidden;
+        display: flex;
+        flex-direction: row;
     }
+
     input {
         border-radius: 7px;
     }
+
+    .ctrl {
+        min-width: 200px;
+        text-align: left;
+        margin: 100px;
+        margin-left: -40px;
+    }
+
+    .unflex {
+        flex-direction: column;
+    }
+
     #fenbox {
         width: 65%;
         color:dimgrey;
         background-color: lightgray;
+        margin-bottom: 25px;
     }
 
     #ucibox {
         width: 50px;
     }
+
     button {
         color: white;
         font-weight: bold;
@@ -116,9 +139,11 @@
         border-radius: 7px;
         padding: 10px;
     }
-    /* button.unimplemented {
+
+    button.unimplemented {
         background-color: #6d1e1e;
-    } */
+    }
+
     button.implemented {
         background-color: #3aaf28;
     }

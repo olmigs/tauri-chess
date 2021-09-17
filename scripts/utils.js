@@ -1,7 +1,21 @@
-import { ROW_LABELS, COL_LABELS, WHITE_PAWN, BLACK_PAWN, WHITE_ROOK,   BLACK_ROOK, WHITE_BISHOP, BLACK_BISHOP, WHITE_KNIGHT, BLACK_KNIGHT,
-    WHITE_QUEEN, BLACK_QUEEN, BLACK_KING, WHITE_KING } from '../src/chess.js';
+import {
+    ROW_LABELS,
+    COL_LABELS,
+    WHITE_PAWN,
+    BLACK_PAWN,
+    WHITE_ROOK,
+    BLACK_ROOK,
+    WHITE_BISHOP,
+    BLACK_BISHOP,
+    WHITE_KNIGHT,
+    BLACK_KNIGHT,
+    WHITE_QUEEN,
+    BLACK_QUEEN,
+    BLACK_KING,
+    WHITE_KING,
+} from '../src/chess.js';
 // import { TauriHttpClient } from '../classes/TauriHttpClient.js';
-import { FEN } from '../src/stores.js';
+import { FEN, CAPTURES } from '../src/stores.js';
 
 export function getImg(val) {
     let retStr = 'assets/';
@@ -56,10 +70,10 @@ function translate(str) {
     }
     if (isNumeric(str.slice(0, 1))) {
         let preStr = ''; // can still get you pregnant
-        let bacStr = str.slice(1, str.length)
+        let bacStr = str.slice(1, str.length);
         let firstChar = str.slice(0, 1);
         for (let i = 0; index < firstChar; ++i) {
-            preStr += ".";
+            preStr += '.';
         }
         translate(preStr + newStr + bacStr);
     } else {
@@ -67,52 +81,46 @@ function translate(str) {
     }
 }
 
-export function callServer(endpoint, server) {
-
-}
+export function callServer(endpoint, server) {}
 
 export function getRandomBoard(serv) {
     const url = serv + '/game/rand';
     callEndpoint(url, 'text')
-        .then(fen => FEN.set(fen))
-        .catch(err => console.log(err));
-} 
+        .then((fen) => FEN.set(fen))
+        .catch((err) => console.log(err));
+}
 
 export function connectToServer(serv) {
     const url = serv + '/game/pos';
     callEndpoint(url, 'text')
-        .then(fen => FEN.set(fen))
-        .catch(err => console.log(err));
+        .then((fen) => FEN.set(fen))
+        .catch((err) => console.log(err));
 }
 
 export function sendUCI(uci, serv) {
     const url = serv + '/game/move';
-    var uci_wrapper = {"uci": uci};
+    var uci_wrapper = { uci: uci };
     callEndpoint(url, 'text', 'POST', uci_wrapper)
-        .then(fen => FEN.set(fen.slice(1, fen.length-1))) // removes double quotes
-        .catch(err => console.log(err));
+        .then((fen) => FEN.set(fen.slice(1, fen.length - 1))) // removes double quotes
+        .catch((err) => console.log(err));
 }
 
 export function sendFEN(fen, serv) {
     const url = serv + '/game/set';
-    var fen_wrapper = { "fen": fen };
+    var fen_wrapper = { fen: fen };
     callEndpoint(url, 'text', 'PUT', fen_wrapper)
-        .then(fen => FEN.set(fen))
-        .catch(err => console.log(err));
+        .then((fen) => FEN.set(fen))
+        .catch((err) => console.log(err));
 }
 
 export function generateMoves(src, serv) {
-    console.log("SOURCE SQ: " + src);
-}
-
-export function getCaptures(serv) {
-    const url = serv + '/game/captures';
+    const url = serv + '/game/moves';
     callEndpoint(url, 'text')
-        .then(captures => { 
-            // console.log(captures);
-            CAPTURES.set(captures); 
+        .then((captures) => {
+            console.log(captures);
+            CAPTURES.set(captures);
         })
-        .catch(err => console.log(err));
+        .catch((err) => console.log(err));
 }
 
 export function getCapturesForSrc(src, captures) {
@@ -126,8 +134,8 @@ export function getCapturesForSrc(src, captures) {
 }
 
 export function updateLoc(loc, r, c) {
-    let newLoc = ''
-    let locArr = [...loc]
+    let newLoc = '';
+    let locArr = [...loc];
 }
 
 export function callEndpoint(url, responseType, method = 'GET', data = '') {
@@ -145,18 +153,81 @@ export function callEndpoint(url, responseType, method = 'GET', data = '') {
         return http
             .fetch(url, {
                 method: 'GET',
-                responseType: type
-            }).then(resp => {
-                return resp.data
+                responseType: type,
+            })
+            .then((resp) => {
+                return resp.data;
             });
     } else {
         return http
             .fetch(url, {
                 method: method,
                 body: http.Body.json(data),
-                responseType: type
-            }).then(resp => { 
-                return resp.data
+                responseType: type,
+            })
+            .then((resp) => {
+                return resp.data;
             });
     }
+}
+
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+}
+
+function getNew(pieces) {
+    // should pieces be "scrambled" each time?
+    var newPieces = [];
+    for (let i = 0; i < 8; i++) {
+        let randIndex = getRandomInt(8 - i);
+        let piece = pieces[randIndex];
+        newPieces.push(piece);
+        piecesFore = pieces.slice(0, randIndex);
+        piecesAft = pieces.slice(randIndex + 1, pieces.length);
+        pieces = [...piecesFore, ...piecesAft];
+    }
+    return newPieces;
+}
+
+function generateBackboard() {
+    const pieces = ['k', 'q', 'r', 'r', 'b', 'b', 'n', 'n'];
+    var pieces2 = getNew(pieces);
+    var tries = 1;
+    while (!validatePieces(pieces2)) {
+        pieces2 = getNew(pieces);
+        tries++;
+    }
+    console.log('Attempts made: ' + tries);
+    return pieces2;
+}
+
+function validatePieces(pieces) {
+    var rookIn = false;
+    var rookInKingIn = false;
+    var rookOut = false;
+    for (let piece of pieces) {
+        switch (piece) {
+            case 'r':
+                if (rookIn) {
+                    if (!rookInKingIn) {
+                        return false;
+                    } else {
+                        rookOut = true;
+                    }
+                } else {
+                    rookIn = true;
+                }
+                break;
+            case 'k':
+                if (rookIn) {
+                    rookInKingIn = true;
+                }
+                break;
+            case 'x':
+                return false;
+        }
+    }
+    if (rookOut) {
+        return true;
+    } else return false;
 }

@@ -4,7 +4,7 @@
     import { getImg } from '../scripts/utils.js';
     import { SOURCE_ID, DESTINATION_ID} from './stores.js';
     export let id, value, isDark;
-    $: cssVarStyles = `--cell-color:${isDark ? '#ddd' : '#779ec6'};`;
+    let cssVarStyles = `--cell-color:${isDark ? '#ddd' : '#779ec6'};`;
     function isCapturable(dest, src) {
         // var captsArr = capts.slice(1,capts.length-1);
         // if (captsArr.length) {

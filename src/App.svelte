@@ -1,16 +1,22 @@
 <script>
     import Grid from './Grid.svelte';
     // import Importer from './Importer.svelte'
-    import { FEN, SOURCE_ID, DESTINATION_ID, CAPTURES} from './stores.js';
-    import { INITIAL_FEN } from './chess.js';
-    import { callServer, connectToServer, sendUCI, getRandomBoard, updateLoc, sendFEN, generateMoves } from '../scripts/utils.js';
+    import { FEN, SOURCE_ID, DESTINATION_ID, CAPTURES, TURN} from './stores';
+    import { INITIAL_FEN } from './chess';
+    import { connectToServer, sendUCI, getRandomBoard, updateLoc, sendFEN } from '../scripts/utils';
 import Cell from './Cell.svelte';
     export let server;
+    // let cssVarStyles = `--turn-color:${TURN === 'b' ? '#ddd' : '#779ec6'};`;
 
     function newGame() {
         FEN.set(INITIAL_FEN);
         document.getElementById('fenbox').value = INITIAL_FEN;
     }
+
+    function getStyleBasedOnTurn(turn) {
+        return turn == 'w' ? '#ddd' : '#779ec6';
+    }
+
     function handleInput() {
         var inputStr = document.getElementById('fenbox').value;
         // console.log(inputStr);
@@ -84,19 +90,21 @@ import Cell from './Cell.svelte';
     
     <div class="ctrl">
         <h1>chess man</h1>
-        <button class="implemented" on:click={() => connectToServer(server)}>Server FEN</button>
+        <button class="implemented" on:click={() => connectToServer(server)}>Server Connect</button>
         <button class="implemented" on:click={newGame}>New Game</button>
         <button class="implemented" on:click={() => getRandomBoard(server)}>Random</button>
         <div class="unflex">
             <button class="implemented" on:click={() => sendUCI($SOURCE_ID + $DESTINATION_ID, server)}>Send Move: {$SOURCE_ID}</button>
             <input id="ucibox" type="text" bind:value={$DESTINATION_ID} autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
         </div>
-        <button class="unimplemented" on:click={() => generateMoves($SOURCE_ID, server)}>Show Moves</button>
-        {#each $CAPTURES as mov}
-            {#if mov.includes($SOURCE_ID)}
-                <p>{mov}</p>
-            {/if}
-        {/each}
+        <!-- <button class="unimplemented" on:click={() => generateMoves($SOURCE_ID, server)}>Show Moves</button> -->
+        <div class="moves">
+            {#each $CAPTURES as mov}
+                {#if mov.includes($SOURCE_ID)}
+                    <p class="move" style="background-color: {getStyleBasedOnTurn($TURN)}">{mov}</p>
+                {/if}
+            {/each}
+        </div>
     </div>
 </main>
 
@@ -121,6 +129,20 @@ import Cell from './Cell.svelte';
         text-align: left;
         margin: 100px;
         margin-left: -40px;
+    }
+
+    .moves {
+        width: 300px;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .move {
+        width: 50px;
+        margin: 5px;
+        padding: 10px;
+        text-align: center;
+        border-radius: 25px;
     }
 
     .unflex {

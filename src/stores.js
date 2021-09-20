@@ -1,5 +1,6 @@
 import { writable, derived } from 'svelte/store';
-import { INITIAL_BOARD, INITIAL_FEN, ROW_LABELS, COL_LABELS } from './chess.js';
+import { INITIAL_BOARD, INITIAL_FEN, ROW_LABELS, COL_LABELS } from './chess';
+import { callEndpoint } from '../scripts/client_http';
 
 // const storedFEN = localStorage.getItem('filename');
 export const FEN = writable(INITIAL_FEN);
@@ -20,8 +21,30 @@ export const SOURCE_ID = derived(SELECTED_CELL, ($CELL, set) => {
 // export const CAPTURES_FOR_SRC = derived(SOURCE_ID, $SRC => {getCapturesForSrc($SRC, CAPTURES)});
 
 export const DESTINATION_ID = writable('');
-
 export const CAPTURES = writable([]);
+export const TURN = writable();
+
+export function updateFEN(new_fen, serv = 'UNSET') {
+    FEN.set(new_fen);
+    if (serv != 'UNSET') {
+        setCaptures(serv);
+        setTurn(new_fen);
+    }
+}
+
+function setCaptures(serv) {
+    callEndpoint(serv, 'moves', 'json')
+        .then((captures) => {
+            // console.log(captures);
+            CAPTURES.set(captures);
+        })
+        .catch((err) => console.log(err));
+}
+
+function setTurn(fen) {
+    var FENarr = fen.split(' ');
+    TURN.set(FENarr[1]);
+}
 
 function concat1DStringArray(arr) {
     let retStr = '';
@@ -72,7 +95,7 @@ function checkBoard(board, fen) {
         posStr = munch(posStr);
         if (posStr !== boardRowStr) {
             board[i] = [...posStr];
-            // getCaptures('http://localhost:8080'); // migsnote: need to change this to 'update' flag; can be used for further processing
+            // setCaptures('http://localhost:8080'); // migsnote: need to change this to 'update' flag; can be used for further processing
             // return false;
         }
         i++;

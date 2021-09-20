@@ -115,9 +115,9 @@ export function sendFEN(fen, serv) {
 
 export function generateMoves(src, serv) {
     const url = serv + '/game/moves';
-    callEndpoint(url, 'text')
+    callEndpoint(url, 'json')
         .then((captures) => {
-            console.log(captures);
+            // console.log(captures);
             CAPTURES.set(captures);
         })
         .catch((err) => console.log(err));

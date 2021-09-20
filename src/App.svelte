@@ -1,9 +1,10 @@
 <script>
     import Grid from './Grid.svelte';
     // import Importer from './Importer.svelte'
-    import { FEN, SOURCE_ID, DESTINATION_ID} from './stores.js';
+    import { FEN, SOURCE_ID, DESTINATION_ID, CAPTURES} from './stores.js';
     import { INITIAL_FEN } from './chess.js';
     import { callServer, connectToServer, sendUCI, getRandomBoard, updateLoc, sendFEN, generateMoves } from '../scripts/utils.js';
+import Cell from './Cell.svelte';
     export let server;
 
     function newGame() {
@@ -90,7 +91,12 @@
             <button class="implemented" on:click={() => sendUCI($SOURCE_ID + $DESTINATION_ID, server)}>Send Move: {$SOURCE_ID}</button>
             <input id="ucibox" type="text" bind:value={$DESTINATION_ID} autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
         </div>
-        <button class="unimplemented" on:click={() => generateMoves($SOURCE_ID, server)}>Get Moves for {$SOURCE_ID}</button>
+        <button class="unimplemented" on:click={() => generateMoves($SOURCE_ID, server)}>Show Moves</button>
+        {#each $CAPTURES as mov}
+            {#if mov.includes($SOURCE_ID)}
+                <p>{mov}</p>
+            {/if}
+        {/each}
     </div>
 </main>
 

@@ -1,4 +1,4 @@
-import { writable, derived, get } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 import { INITIAL_BOARD, INITIAL_FEN, ROW_LABELS, COL_LABELS } from './chess.js';
 
 // const storedFEN = localStorage.getItem('filename');

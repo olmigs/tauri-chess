@@ -3,7 +3,7 @@
     // import Importer from './Importer.svelte'
     import { FEN, SOURCE_ID, DESTINATION_ID, CAPTURES, TURN} from './stores';
     import { INITIAL_FEN } from './chess';
-    import { connectToServer, sendUCI, getRandomBoard, updateLoc, sendFEN } from '../scripts/utils';
+    import { connectToServer, sendUCI, getRandomBoard, updateLoc, sendFEN, new960 } from '../scripts/utils';
 import Cell from './Cell.svelte';
     export let server;
     // let cssVarStyles = `--turn-color:${TURN === 'b' ? '#ddd' : '#779ec6'};`;
@@ -90,19 +90,19 @@ import Cell from './Cell.svelte';
     
     <div class="ctrl">
         <h1>chess man</h1>
-        <button class="implemented" on:click={() => connectToServer(server)}>Server Connect</button>
-        <button class="implemented" on:click={newGame}>New Game</button>
+        <button class="implemented" on:click={() => connectToServer(server)}>Server Connect</button><br/>
+        <button class="implemented" on:click={newGame}>New</button>
+        <button class="implemented" on:click={new960}>New 960</button>
         <button class="implemented" on:click={() => getRandomBoard(server)}>Random</button>
-        <div class="unflex">
+        <!-- <div class="unflex">
             <button class="implemented" on:click={() => sendUCI($SOURCE_ID + $DESTINATION_ID, server)}>Send Move: {$SOURCE_ID}</button>
             <input id="ucibox" type="text" bind:value={$DESTINATION_ID} autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-        </div>
+        </div> -->
         <!-- <button class="unimplemented" on:click={() => generateMoves($SOURCE_ID, server)}>Show Moves</button> -->
+        <h4>moves</h4>
         <div class="moves">
             {#each $CAPTURES as mov}
-                {#if mov.includes($SOURCE_ID)}
-                    <p class="move" style="background-color: {getStyleBasedOnTurn($TURN)}">{mov}</p>
-                {/if}
+                <p class="move" on:click={() => sendUCI(mov, server)} style="background-color: {getStyleBasedOnTurn($TURN)}">{mov}</p>
             {/each}
         </div>
     </div>
@@ -127,12 +127,12 @@ import Cell from './Cell.svelte';
     .ctrl {
         min-width: 200px;
         text-align: left;
-        margin: 100px;
-        margin-left: -40px;
+        /* margin: 100px; */
+        margin-left: -30px;
     }
 
     .moves {
-        width: 300px;
+        width: 250px;
         display: flex;
         flex-wrap: wrap;
     }
@@ -140,7 +140,7 @@ import Cell from './Cell.svelte';
     .move {
         width: 50px;
         margin: 5px;
-        padding: 10px;
+        padding: 7px;
         text-align: center;
         border-radius: 25px;
     }

@@ -18,7 +18,6 @@ export const SOURCE_ID = derived(SELECTED_CELL, ($CELL, set) => {
         set('');
     }
 });
-// export const CAPTURES_FOR_SRC = derived(SOURCE_ID, $SRC => {getCapturesForSrc($SRC, CAPTURES)});
 
 export const DESTINATION_ID = writable('');
 export const CAPTURES = writable([]);
@@ -46,57 +45,39 @@ function setTurn(fen) {
     TURN.set(FENarr[1]);
 }
 
-function concat1DStringArray(arr) {
-    let retStr = '';
-    for (let str of arr) {
-        retStr += str;
-    }
-    return retStr;
-}
-
 function isNumeric(num) {
     return !isNaN(num);
 }
 
-function chewStr(val) {
-    if (isNumeric(val)) {
-        let retStr = '';
-        for (let i = 0; i < val; i++) {
-            retStr += '.';
-        }
-        return retStr;
-    } else {
-        return val;
+function numToDot(num) {
+    if (num.slice(num.length-1, num.length) == 0) {
+        return num.slice(0, num.length-1);
     }
+    return numToDot('.' + num.slice(0, num.length-1) + (num.slice(num.length-1, num.length) - 1));
 }
 
-// migsnote: BADLY IMPLEMENTED i.e. not recursive
-function munch(str) {
+function rankToRow(str) {
     var retStr = '';
     var strArr = [...str];
     for (let i = 0; i < strArr.length; i++) {
-        retStr += chewStr(strArr[i]);
+        if (isNumeric(strArr[i])) {
+            retStr += numToDot(strArr[i]);
+        } else {
+            retStr += strArr[i];
+        }
     }
     return retStr;
 }
 
-// migsnote: god object potential?
-function checkBoard(board, fen) {
-    // migstodo: validate fen?
-    // CAPTURES.set(getCaptures('http://localhost:8080'));
-    // split into string array representing rows
-    var FENarr = fen.split(' '); // FENarr.length === 6
-    var pos = FENarr[0].split('/'); // pos.length === 8
+export function checkBoard(board, fen) {
+    var fieldsArr = fen.split(' '); 
+    var posArr = fieldsArr[0].split('/');
     var i = 0;
-    for (let posStr of pos) {
-        // console.log(board[i]);
-        let boardRowStr = concat1DStringArray(board[i]);
-        // console.log(boardRowStr);
-        posStr = munch(posStr);
-        if (posStr !== boardRowStr) {
-            board[i] = [...posStr];
-            // setCaptures('http://localhost:8080'); // migsnote: need to change this to 'update' flag; can be used for further processing
-            // return false;
+    for (let pos of posArr) {
+        // console.log('FEN rank: ' + pos + ' to row: ' + rankToRow(pos) + ' | BOARD row: ' + board[i].join(''));
+        pos = rankToRow(pos);
+        if (pos !== board[i].join('')) {
+            board[i] = [...pos];
         }
         i++;
     }

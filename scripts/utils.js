@@ -1,6 +1,4 @@
 import {
-    ROW_LABELS,
-    COL_LABELS,
     WHITE_PAWN,
     BLACK_PAWN,
     WHITE_ROOK,
@@ -16,6 +14,7 @@ import {
 } from '../src/chess';
 import { callEndpoint } from './client_http';
 import { updateFEN } from '../src/stores';
+import { fen960 } from './fen960';
 
 export function getImg(val) {
     let retStr = 'assets/';
@@ -91,6 +90,10 @@ export function sendFEN(fen, serv) {
         .catch((err) => console.log(err));
 }
 
+export function new960() {
+    updateFEN(fen960());
+}
+
 // -- nothing
 // -- useful
 // -- below 09/20/21
@@ -98,65 +101,4 @@ export function sendFEN(fen, serv) {
 export function updateLoc(loc, r, c) {
     let newLoc = '';
     let locArr = [...loc];
-}
-
-function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
-}
-
-function getNew(pieces) {
-    // should pieces be "scrambled" each time?
-    var newPieces = [];
-    for (let i = 0; i < 8; i++) {
-        let randIndex = getRandomInt(8 - i);
-        let piece = pieces[randIndex];
-        newPieces.push(piece);
-        piecesFore = pieces.slice(0, randIndex);
-        piecesAft = pieces.slice(randIndex + 1, pieces.length);
-        pieces = [...piecesFore, ...piecesAft];
-    }
-    return newPieces;
-}
-
-function generateBackboard() {
-    const pieces = ['k', 'q', 'r', 'r', 'b', 'b', 'n', 'n'];
-    var pieces2 = getNew(pieces);
-    var tries = 1;
-    while (!validatePieces(pieces2)) {
-        pieces2 = getNew(pieces);
-        tries++;
-    }
-    console.log('Attempts made: ' + tries);
-    return pieces2;
-}
-
-function validatePieces(pieces) {
-    var rookIn = false;
-    var rookInKingIn = false;
-    var rookOut = false;
-    for (let piece of pieces) {
-        switch (piece) {
-            case 'r':
-                if (rookIn) {
-                    if (!rookInKingIn) {
-                        return false;
-                    } else {
-                        rookOut = true;
-                    }
-                } else {
-                    rookIn = true;
-                }
-                break;
-            case 'k':
-                if (rookIn) {
-                    rookInKingIn = true;
-                }
-                break;
-            case 'x':
-                return false;
-        }
-    }
-    if (rookOut) {
-        return true;
-    } else return false;
 }

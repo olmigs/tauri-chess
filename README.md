@@ -1,3 +1,6 @@
-# Chess UI client in Javascript using Svelte/Rollup and Tauri
+# Javascript Chess UI client Svelte and Tauri
 
-This document is a work in progress. In the meantime, you can check out [my blog](http://mdguerrero.com/) for a write-up on building the UI client!
+## Requirements
+- [tide-pleco](https://github.com/olmigs/tide-pleco)
+
+This document is a work in progress. Check you can check [my blog](http://mdguerrero.com/) for more information.

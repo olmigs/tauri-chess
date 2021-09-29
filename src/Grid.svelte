@@ -49,7 +49,7 @@
     th {
         text-align: center;
         vertical-align: middle;
-        padding: 4ex 4ex;
+        padding: 2.4ex 2.4ex;
         font-weight: normal;
         color: #000;
         border: 4px solid transparent;

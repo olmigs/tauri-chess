@@ -6,18 +6,6 @@
     export let id, value, isDark;
     let cssVarStyles = `--cell-color:${isDark ? '#ddd' : '#779ec6'};`;
     function isCapturable(dest, src) {
-        // var captsArr = capts.slice(1,capts.length-1);
-        // if (captsArr.length) {
-        //     captsArr = captsArr.replaceAll('\"', '');
-        //     captsArr = captsArr.split(',');
-        //     for (let i = 0; i < captsArr.length; i++) {
-        //         // capt = capt.replace('\"', '');
-        //         if (captsArr[i].includes(src)) {
-        //             console.log(captsArr[i]);
-        //         }
-
-        //     }
-        // }
         return false;
     }
 </script>
@@ -34,6 +22,11 @@
 </td>
 
 <style>
+    /* img {
+        max-width: 20px;
+        max-height: 20px;
+    } */
+
     td {
         text-align: center;
         vertical-align: middle;
@@ -44,12 +37,15 @@
         transition: all .4s ease-out;
         background-color: var(--cell-color, #779ec6);
     }
+
     td.selectedSrc {
         border-color: #ff0;
     }
+
     td.selectedDest {
         border-color: #0f0;
     }
+
     td.capturable {
         border-color: #f00;
     }

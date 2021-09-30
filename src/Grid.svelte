@@ -2,15 +2,13 @@
     // import { onMount } from 'svelte';
     import Cell from './Cell.svelte';
     import { ROW_LABELS, COL_LABELS } from './chess.js';
-    import { BOARD, SELECTED_CELL } from './stores.js';
+    import { BOARD } from './stores.js';
 
     const rows = [0, 1, 2, 3, 4, 5, 6, 7];
     const cols = [0, 1, 2, 3, 4, 5, 6, 7];
     
     function handleClick(r, c) {
-        // if (r != selected_cell.row || c != selected_cell.col) {
-            SELECTED_CELL.set({row: r, col: c});
-        // }
+        // SELECTED_CELL.set({row: r, col: c});
     }
 </script>
 

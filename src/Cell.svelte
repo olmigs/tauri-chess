@@ -2,17 +2,13 @@
 <script>
     // import { onMount } from 'svelte';
     import { getImg } from '../scripts/utils.js';
-    import { SOURCE_ID, DESTINATION_ID} from './stores.js';
     export let id, value, isDark;
     let cssVarStyles = `--cell-color:${isDark ? '#ddd' : '#779ec6'};`;
     function isCapturable(dest, src) {
         return false;
     }
 </script>
-<!-- class:capturable="{() => isCapturable(id, $SOURCE_ID, $CAPTURES)}" -->
-<td class:selectedSrc="{id === $SOURCE_ID}" 
-    class:selectedDest="{id === $DESTINATION_ID}"
-    class:capturable="{isCapturable(id, $SOURCE_ID)}"
+<td 
     id={id} style={cssVarStyles} on:click >
     {#if value !== '.'}
         <img src={getImg(value)} alt={value}>
@@ -22,11 +18,6 @@
 </td>
 
 <style>
-    /* img {
-        max-width: 20px;
-        max-height: 20px;
-    } */
-
     td {
         text-align: center;
         vertical-align: middle;

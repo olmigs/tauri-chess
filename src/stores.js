@@ -10,16 +10,16 @@ export const FEN = writable(INITIAL_FEN);
 
 export const BOARD = derived(FEN, ($FEN) => checkBoard(INITIAL_BOARD, $FEN));
 
-export const SELECTED_CELL = writable({ row: -1, col: -1 });
-export const SOURCE_ID = derived(SELECTED_CELL, ($CELL, set) => {
-    if ($CELL.row != -1 && $CELL.col != -1) {
-        set(COL_LABELS[$CELL.col] + ROW_LABELS[$CELL.row]);
-    } else {
-        set('');
-    }
-});
+// export const SELECTED_CELL = writable({ row: -1, col: -1 });
+// export const SOURCE_ID = derived(SELECTED_CELL, ($CELL, set) => {
+//     if ($CELL.row != -1 && $CELL.col != -1) {
+//         set(COL_LABELS[$CELL.col] + ROW_LABELS[$CELL.row]);
+//     } else {
+//         set('');
+//     }
+// });
 
-export const DESTINATION_ID = writable('');
+// export const DESTINATION_ID = writable('');
 export const CAPTURES = writable([]);
 export const TURN = writable();
 

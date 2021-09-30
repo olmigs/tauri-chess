@@ -93,12 +93,3 @@ export function sendFEN(fen, serv) {
 export function new960() {
     updateFEN(fen960());
 }
-
-// -- nothing
-// -- useful
-// -- below 09/20/21
-
-export function updateLoc(loc, r, c) {
-    let newLoc = '';
-    let locArr = [...loc];
-}

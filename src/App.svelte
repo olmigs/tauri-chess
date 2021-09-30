@@ -1,10 +1,8 @@
 <script>
     import Grid from './Grid.svelte';
-    // import Importer from './Importer.svelte'
-    import { FEN, SOURCE_ID, DESTINATION_ID, CAPTURES, TURN} from './stores';
+    import { FEN, CAPTURES, TURN} from './stores';
     import { INITIAL_FEN } from './chess';
-    import { connectToServer, sendUCI, getRandomBoard, updateLoc, sendFEN, new960 } from '../scripts/utils';
-import Cell from './Cell.svelte';
+    import { connectToServer, sendUCI, getRandomBoard, sendFEN, new960 } from '../scripts/utils';
     export let server;
     // let cssVarStyles = `--turn-color:${TURN === 'b' ? '#ddd' : '#779ec6'};`;
 
@@ -16,72 +14,11 @@ import Cell from './Cell.svelte';
     function getStyleBasedOnTurn(turn) {
         return turn == 'w' ? '#ddd' : '#779ec6';
     }
-
-    function handleInput() {
-        var inputStr = document.getElementById('fenbox').value;
-        // console.log(inputStr);
-        if (inputStr != FEN) {
-            // BOARD.update(b => checkBoard(b, inputStr));
-            FEN.set(inputStr);
-        }   
-    }
-
-	function handleKeydown(event) {
-		const keys = ['y', 'g']
-        if (keys.includes(event.key)) {
-            bindKey(event.key)
-        }
-	}
-
-    let key1;
-	let key2;
-    function bindKey(key) {
-        if (!key1) {
-            key1 = key;
-        } else if (!key2) {
-            key2 = key;
-        } else {
-            let success = moveBasedOnKey(key1, key2);
-            if (success) {
-                key2 = null;
-            }
-        }
-    }
-
-    function moveBasedOnKey(sprite, loc) {
-        var row = 0;
-        var col = 0;
-        switch (loc) {
-            case 'ArrowUp':
-                col++;
-                break;
-            case 'ArrowDown':
-                col--;
-                break;
-            case 'ArrowLeft':
-                row--;
-                break;
-            case 'ArrowRight':
-                row++;
-                break;
-        }
-        if (row != 0 || col != 0) {
-            if (sprite === 'y') {
-                SOURCE_ID.update(src => updateLoc(src, row, col))
-            }
-            if (sprite === 'g') {
-                DESTINATION_ID.update(dest => updateLoc(dest, row, col))
-            }
-            return true;
-        } else { return false; }
-        
-    }
 </script>
 
 <!-- <svelte:window on:keydown={handleKeydown}/> -->
 
 <main>
-    <!-- <p>{$CAPTURES}</p> -->
     <div>
         <Grid />
         <input id="fenbox" type="text" readonly="readonly" bind:value={$FEN}/>

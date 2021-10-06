@@ -1,8 +1,8 @@
 import { writable, derived } from 'svelte/store';
-import { INITIAL_BOARD, INITIAL_FEN, ROW_LABELS, COL_LABELS } from './chess';
+import { INITIAL_BOARD, INITIAL_FEN } from './chess';
 import { callEndpoint } from '../scripts/client_http';
 
-// const storedFEN = localStorage.getItem('filename');
+// const storedFEN = localStorage.getItem('FEN');
 export const FEN = writable(INITIAL_FEN);
 // FEN.subscribe(value => {
 //     localStorage.setItem('FEN', value === null ? '' : value);
@@ -10,32 +10,54 @@ export const FEN = writable(INITIAL_FEN);
 
 export const BOARD = derived(FEN, ($FEN) => checkBoard(INITIAL_BOARD, $FEN));
 
-// export const SELECTED_CELL = writable({ row: -1, col: -1 });
-// export const SOURCE_ID = derived(SELECTED_CELL, ($CELL, set) => {
-//     if ($CELL.row != -1 && $CELL.col != -1) {
-//         set(COL_LABELS[$CELL.col] + ROW_LABELS[$CELL.row]);
-//     } else {
-//         set('');
-//     }
-// });
-
-// export const DESTINATION_ID = writable('');
-export const CAPTURES = writable([]);
+export const MOVES = writable([]);
 export const TURN = writable();
+
+export const MOVES_FROM_SRC = writable([]);
+export const FLIP = writable(false);
+export const R_INDICES = derived(FLIP, ($FLIP) => flipIndices($FLIP));
+export const C_INDICES = derived(FLIP, ($FLIP) => flipIndices($FLIP));
+
+function flipIndices(flip) {
+    if (!flip) {
+        return [0, 1, 2, 3, 4, 5, 6, 7];
+    } else {
+        return [7, 6, 5, 4, 3, 2, 1, 0];
+    }
+}
 
 export function updateFEN(new_fen, serv = 'UNSET') {
     FEN.set(new_fen);
     if (serv != 'UNSET') {
-        setCaptures(serv);
+        setMoves(serv);
         setTurn(new_fen);
+        MOVES_FROM_SRC.set([]);
     }
 }
 
-function setCaptures(serv) {
+export function updateMovesFromSrc(src, moves) {
+    let new_mfs = [];
+    for (let mov of moves) { 
+        if (mov.includes(src)) {
+            new_mfs.push(mov);
+        }
+    }
+    MOVES_FROM_SRC.set(new_mfs);
+}
+
+export function flip(value) {
+    if (value) {
+        FLIP.set(false);
+    } else {
+        FLIP.set(true);
+    }
+}
+
+function setMoves(serv) {
     callEndpoint(serv, 'moves', 'json')
         .then((captures) => {
             // console.log(captures);
-            CAPTURES.set(captures);
+            MOVES.set(captures);
         })
         .catch((err) => console.log(err));
 }

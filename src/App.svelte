@@ -1,9 +1,10 @@
 <script>
     import Grid from './Grid.svelte';
-    import { FEN, CAPTURES, TURN} from './stores';
+    import { FEN, MOVES_FROM_SRC, TURN, FLIP, flip} from './stores';
     import { INITIAL_FEN } from './chess';
-    import { connectToServer, sendUCI, getRandomBoard, sendFEN, new960 } from '../scripts/utils';
+    import { connectToServer, sendUCI, getRandomBoard, sendFEN, new960, undoMove } from '../scripts/utils';
     export let server;
+    let send = false;
     // let cssVarStyles = `--turn-color:${TURN === 'b' ? '#ddd' : '#779ec6'};`;
 
     function newGame() {
@@ -21,25 +22,34 @@
 <main>
     <div>
         <Grid />
-        <input id="fenbox" type="text" readonly="readonly" bind:value={$FEN}/>
-        <button class="implemented" on:click={() => sendFEN($FEN, server)}>Send to Server</button>
+        <input id="fen-box" type="text" readonly="readonly" bind:value={$FEN}/>
+        <button class="backend" on:click={() => sendFEN($FEN, server)}>Send FEN</button>
     </div>
     
     <div class="ctrl">
         <h1>chess man</h1>
-        <button class="implemented" on:click={() => connectToServer(server)}>Server Connect</button><br/>
-        <button class="implemented" on:click={newGame}>New</button>
-        <button class="implemented" on:click={new960}>New 960</button>
-        <button class="implemented" on:click={() => getRandomBoard(server)}>Random</button>
+        <div id="legend-box" class="backend"> <p>server</p> </div>
+        <div id="legend-box" class="frontend"> <p>client</p> </div>
+        <br/>
+        <label style="margin-left:10px;">
+            <input type=checkbox bind:checked={send}>
+            pleco play
+        </label>
+        <br/>
+        <button class="backend" on:click={() => connectToServer(server)}>Receive FEN</button><br/>
+        <button class="backend" on:click={() => getRandomBoard(server)}>Random</button><br/>
+        <button class="frontend" on:click={newGame}>New</button>
+        <button class="frontend" on:click={new960}>New 960</button><br/>
+        <button class="frontend" on:click={() => flip($FLIP)}>Flip Board</button><br/>
         <!-- <div class="unflex">
-            <button class="implemented" on:click={() => sendUCI($SOURCE_ID + $DESTINATION_ID, server)}>Send Move: {$SOURCE_ID}</button>
+            <button class="frontend" on:click={() => sendUCI($SOURCE_ID + $DESTINATION_ID, server)}>Send Move: {$SOURCE_ID}</button>
             <input id="ucibox" type="text" bind:value={$DESTINATION_ID} autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
         </div> -->
-        <!-- <button class="unimplemented" on:click={() => generateMoves($SOURCE_ID, server)}>Show Moves</button> -->
-        <h4>moves</h4>
+        <button class="backend" on:click={() => undoMove(server)}>{'<'}</button>
+        <h4>available moves</h4>
         <div class="moves">
-            {#each $CAPTURES as mov}
-                <p class="move" on:click={() => sendUCI(mov, server)} style="background-color: {getStyleBasedOnTurn($TURN)}">{mov}</p>
+            {#each $MOVES_FROM_SRC as mov}
+                <p class="move" on:click={() => sendUCI(send, mov, server)} style="background-color: {getStyleBasedOnTurn($TURN)}">{mov}</p>
             {/each}
         </div>
     </div>
@@ -82,20 +92,32 @@
         border-radius: 25px;
     }
 
-    .unflex {
-        flex-direction: column;
-    }
-
-    #fenbox {
+    #fen-box {
         width: 65%;
         color:dimgrey;
         background-color: lightgray;
         margin-bottom: 25px;
     }
 
+    #legend-box {
+        width: 20px;
+        height: 20px; 
+        margin: 10px;
+        border-radius: 7px;
+    }
+
+    #legend-box p {
+        margin-top: 0;
+        margin-left: 30px;
+    }
+
+    /* .unflex {
+        flex-direction: column;
+    }
+
     #ucibox {
         width: 50px;
-    }
+    } */
 
     button {
         color: white;
@@ -105,11 +127,11 @@
         padding: 10px;
     }
 
-    button.unimplemented {
+    .backend {
         background-color: #6d1e1e;
     }
 
-    button.implemented {
+    .frontend {
         background-color: #3aaf28;
     }
 </style>

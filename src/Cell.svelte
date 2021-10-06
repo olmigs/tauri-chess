@@ -1,14 +1,20 @@
 
 <script>
-    // import { onMount } from 'svelte';
-    import { getImg } from '../scripts/utils.js';
+    import { MOVES_FROM_SRC } from './stores';
+    import { getImg } from '../scripts/utils';
     export let id, value, isDark;
     let cssVarStyles = `--cell-color:${isDark ? '#ddd' : '#779ec6'};`;
-    function isCapturable(dest, src) {
-        return false;
+    // migstodo
+    function isMoveable(cell, moves) {
+        for (let mov of moves) { 
+            if (mov.includes(cell)) {
+                return true;
+            }
+        }
     }
 </script>
 <td 
+    class:moveable="{isMoveable(id, $MOVES_FROM_SRC)}"
     id={id} style={cssVarStyles} on:click >
     {#if value !== '.'}
         <img src={getImg(value)} alt={value}>
@@ -29,15 +35,7 @@
         background-color: var(--cell-color, #779ec6);
     }
 
-    td.selectedSrc {
-        border-color: #ff0;
-    }
-
-    td.selectedDest {
+    td.moveable {
         border-color: #0f0;
-    }
-
-    td.capturable {
-        border-color: #f00;
     }
 </style>

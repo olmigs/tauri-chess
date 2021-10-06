@@ -2,27 +2,20 @@
     // import { onMount } from 'svelte';
     import Cell from './Cell.svelte';
     import { ROW_LABELS, COL_LABELS } from './chess.js';
-    import { BOARD } from './stores.js';
-
-    const rows = [0, 1, 2, 3, 4, 5, 6, 7];
-    const cols = [0, 1, 2, 3, 4, 5, 6, 7];
-    
-    function handleClick(r, c) {
-        // SELECTED_CELL.set({row: r, col: c});
-    }
+    import { BOARD, MOVES, R_INDICES, C_INDICES, updateMovesFromSrc } from './stores.js';
 </script>
 
 <table id="board">
     <tbody>
-        {#each rows as r}
+        {#each $R_INDICES as r}
         <tr>
             <th>{ROW_LABELS[r]}</th>
-            {#each cols as c}
-            <Cell
-                id={COL_LABELS[c] + ROW_LABELS[r]}
-                value={$BOARD[r][c]}
-                on:click={() => handleClick(r, c)}
-                isDark={(r % 2 == 0 && c % 2 == 0) || (r % 2 != 0 && c % 2 != 0)}
+            {#each $C_INDICES as c}
+                <Cell
+                    id={COL_LABELS[c] + ROW_LABELS[r]}
+                    value={$BOARD[r][c]}
+                    on:click={() => updateMovesFromSrc(COL_LABELS[c] + ROW_LABELS[r], $MOVES)}
+                    isDark={(r % 2 == 0 && c % 2 == 0) || (r % 2 != 0 && c % 2 != 0)}
                 />
             {/each}
         </tr>
@@ -31,7 +24,7 @@
     <tfoot>
         <tr>
             <th></th>
-            {#each cols as c}
+            {#each $C_INDICES as c}
             <th>{COL_LABELS[c]}</th>
             {/each}
             <th></th>

@@ -11,18 +11,6 @@ export const BLACK_QUEEN  = "b/b_queen.svg"
 export const WHITE_KING   = "w/w_king.svg"
 export const BLACK_KING   = "b/b_king.svg"
 
-export const WHITES = WHITE_PAWN + WHITE_ROOK + WHITE_BISHOP + WHITE_KNIGHT + WHITE_QUEEN + WHITE_KING;
-export const BLACKS = BLACK_PAWN + BLACK_ROOK + BLACK_BISHOP + BLACK_KNIGHT + BLACK_QUEEN + BLACK_KING;
-export const PAWNS = WHITE_PAWN + BLACK_PAWN;
-export const ROOKS = WHITE_ROOK + BLACK_ROOK;
-export const KNIGHTS = WHITE_KNIGHT + BLACK_KNIGHT;
-export const BISHOPS = WHITE_BISHOP + BLACK_BISHOP;
-export const QUEENS = WHITE_QUEEN + BLACK_QUEEN;
-export const KINGS = WHITE_KING + BLACK_KING;
-
-export const ORTHOGONALS = QUEENS + ROOKS;
-export const DIAGONALS = QUEENS + BISHOPS;
-
 export const INITIAL_BOARD = [
     ['r','n','b','q','k','b','n','r'],
     ['p','p','p','p','p','p','p','p'],

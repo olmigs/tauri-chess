@@ -76,15 +76,21 @@ export function connectToServer(serv) {
         .catch((err) => console.log(err));
 }
 
-export function sendUCI(uci, serv) {
-    var uci_wrapper = { uci: uci };
-    callEndpoint(serv, 'move', 'text', 'POST', uci_wrapper)
+export async function sendUCI(bot, uci, serv) {
+    let uci_wrapper = { uci: uci };
+    let endpoint;
+    if (bot) {
+        endpoint = 'play/move';
+    } else {
+        endpoint = 'move';
+    }
+    await callEndpoint(serv, endpoint, 'text', 'POST', uci_wrapper)
         .then((fen) => updateFEN(fen.slice(1, fen.length - 1), serv)) // removes double quotes
         .catch((err) => console.log(err));
 }
 
 export function sendFEN(fen, serv) {
-    var fen_wrapper = { fen: fen };
+    let fen_wrapper = { fen: fen };
     callEndpoint(serv, 'set', 'text', 'PUT', fen_wrapper)
         .then((serv_fen) => updateFEN(serv_fen, serv))
         .catch((err) => console.log(err));
@@ -92,4 +98,10 @@ export function sendFEN(fen, serv) {
 
 export function new960() {
     updateFEN(fen960());
+}
+
+export function undoMove(serv) {
+    callEndpoint(serv, 'prev', 'text')
+        .then((serv_fen) => updateFEN(serv_fen.slice(1, serv_fen.length - 1), serv))
+        .catch((err) => console.log(err));
 }

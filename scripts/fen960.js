@@ -19,6 +19,7 @@ function getNew(pieces) {
     return newPieces;
 }
 
+// migsnote: logic should be used for a genFen() function in utils.js
 export function fen960() {
     let backArr = generateBackboard();
     let backStr = backArr.join('');
